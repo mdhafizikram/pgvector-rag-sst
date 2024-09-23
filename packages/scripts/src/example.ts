@@ -1,4 +1,11 @@
 import { Resource } from "sst";
-import { Example } from "@monorepo-template/core/example";
 
-console.log(`${Example.hello()} Linked to ${Resource.MyBucket.name}.`);
+interface CustomResource extends Resource {
+  "iam-dpl-rag-bucket": {
+    name: string;
+  };
+}
+
+console.log(
+  ` Linked to ${(Resource as CustomResource)["iam-dpl-rag-bucket"].name}.`
+);

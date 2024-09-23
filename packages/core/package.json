@@ -1,5 +1,5 @@
 {
-  "name": "@monorepo-template/core",
+  "name": "@iam-dpl-rag/core",
   "version": "0.0.0",
   "scripts": {
     "test": "sst shell vitest"
@@ -15,5 +15,6 @@
   },
   "devDependencies": {
     "vitest": "^2.0.3"
-  }
+  },
+  "type": "module"
 }

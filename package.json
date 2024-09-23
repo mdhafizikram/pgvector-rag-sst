@@ -1,15 +1,25 @@
 {
-  "name": "monorepo-template",
+  "name": "iam-dpl-rag",
+  "description": "IAM Data Potluck Rag",
   "version": "0.0.0",
   "workspaces": [
     "packages/*"
   ],
-  "scripts": {},
+  "scripts": {
+    "dev": "sst dev --stage dev",
+    "build-dev": "sst build --stage dev",
+    "deploy-dev": "sst deploy --stage dev",
+    "remove-dev": "sst remove --stage dev",
+    "console-dev": "sst console --stage dev"
+  },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.4",
     "typescript": "5.3.3"
   },
   "dependencies": {
     "sst": "^3"
-  }
+  },
+  "type": "module",
+  "private": true,
+  "author": "Hafiz Md Ikramulla <hafiz.ikramulla@oneorigin.us>"
 }
