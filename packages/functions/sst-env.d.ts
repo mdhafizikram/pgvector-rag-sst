@@ -5,6 +5,10 @@ import "sst"
 export {}
 declare module "sst" {
   export interface Resource {
+    "IamDplRagWeb": {
+      "type": "sst.aws.StaticSite"
+      "url": string
+    }
     "OpenAiApiKey": {
       "type": "sst.sst.Secret"
       "value": string

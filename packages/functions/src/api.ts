@@ -15,7 +15,7 @@ export const handler: Handler = async (_event) => {
 
     switch (path) {
       case "/seeder":
-        if (method === "GET") return await seeder();
+        if (method === "GET") return await seeder(queryStringParameters);
         break;
       case "/similarity-search":
         if (method === "GET") return await Similarity_Search(_event);
@@ -63,7 +63,7 @@ export const handler: Handler = async (_event) => {
         };
     }
   } catch (error) {
-    console.error("Error in handler:", error);
+    console.log("Error in handler:", error);
     return {
       statusCode: 500,
       body: "Internal Server Error",
@@ -71,29 +71,48 @@ export const handler: Handler = async (_event) => {
   }
 };
 
-const batchRequests = async (requests, batchSize) => {
+const batchRequests = async (
+  requests: Array<() => Promise<any>>,
+  batchSize: number
+) => {
   for (let i = 0; i < requests.length; i += batchSize) {
     const batch = requests.slice(i, i + batchSize);
     await Promise.all(
       batch.map((req) =>
         req().catch((error) => {
-          console.error("Error in batch request:", error);
+          console.log("Error in batch request:", error);
         })
       )
     ); // Executes each batch in parallel
   }
 };
 
-async function seeder() {
+async function seeder({ start, end }: { start: number; end: number }) {
   try {
-    console.log("Ingesting acadplans", acadPlans.length);
+    if (!start || !end) {
+      return {
+        statusCode: 400,
+        body: "Bad Request - Missing required parameters in the query string.",
+      };
+    }
 
-    const slicedAcadPlans200 = acadPlans.slice(0, 200);
+    const slicedAcadPlans = acadPlans.slice(start, end);
 
-    const requests = slicedAcadPlans200.map((acadPlan) => async () => {
+    console.log("Ingesting acadplans", start, end, slicedAcadPlans.length);
+
+    const requests = slicedAcadPlans.map((acadPlan) => async () => {
+      const {
+        fullDescription = "",
+        careerOpportunities = "",
+        globalExperienceText = "",
+        acadPlanCode,
+        ...rest
+      } = acadPlan;
+
+      const combinedDescription = `fullDescription:${fullDescription} | careerOpportunities:${careerOpportunities} | globalExperienceText:${globalExperienceText}`;
+
       try {
-        const { fullDescription, acadPlanCode, ...rest } = acadPlan;
-        const vector = await generateEmbeddingOpenAI(fullDescription);
+        const vector = await generateEmbeddingOpenAI(combinedDescription);
 
         return client.put({
           vector,
@@ -101,12 +120,14 @@ async function seeder() {
             type: "acadPlan",
             id: acadPlanCode,
             fullDescription,
+            careerOpportunities,
+            globalExperienceText,
             ...rest,
           },
         });
       } catch (error) {
-        console.error(`Error processing acadPlanCode ${acadPlanCode}:`, error);
-        throw error; // Optionally propagate this if you want to stop on error
+        console.log(`Error processing acadPlanCode ${acadPlanCode}:`, error);
+        throw error;
       }
     });
 
@@ -117,7 +138,7 @@ async function seeder() {
       body: "done",
     };
   } catch (error) {
-    console.error("Error in seeder:", error);
+    console.log("Error in seeder:", error);
     return {
       statusCode: 500,
       body: "Internal Server Error",
@@ -136,7 +157,7 @@ async function Similarity_Search(event: APIGatewayEvent) {
         body: "Bad Request - Missing query string parameters.",
       };
     }
-    const { prompt, degreeType, acadPlanType } = queryParams;
+    const { prompt, degreeType, acadPlanType, count = "10" } = queryParams;
 
     if (!prompt || !degreeType || !acadPlanType) {
       return {
@@ -147,11 +168,9 @@ async function Similarity_Search(event: APIGatewayEvent) {
 
     const vector = await generateEmbeddingOpenAI(prompt);
 
-    console.log("Vector", vector.length);
-
     const ret = await client.query({
       vector,
-      count: 5,
+      count: parseInt(count),
       threshold: 0.7,
       include: {
         type: "acadPlan",
@@ -165,7 +184,7 @@ async function Similarity_Search(event: APIGatewayEvent) {
       body: JSON.stringify(ret, null, 2),
     };
   } catch (error) {
-    console.error("Error in Similarity_Search:", error);
+    console.log("Error in Similarity_Search:", error);
     return {
       statusCode: 500,
       body: "Internal Server Error",
@@ -182,7 +201,7 @@ async function getAcadPlanDescription(acadPlanCode: string) {
 
     return data.fullDescription;
   } catch (error) {
-    console.error("Error getting academic plan description:", error);
+    console.log("Error getting academic plan description:", error);
     throw error;
   }
 }
@@ -197,7 +216,7 @@ async function generateEmbeddingOpenAI(text: string) {
 
     return embeddingResponse.data[0].embedding;
   } catch (error) {
-    console.error("Error generating embedding:", error);
+    console.log("Error generating embedding:", error);
     throw error;
   }
 }
@@ -258,7 +277,7 @@ async function getReasoning(acadPlanDescription = "", userQuery = "") {
 
     return reasoningResponse;
   } catch (error) {
-    console.error(`Error getting reasoning`, error);
+    console.log(`Error getting reasoning`, error);
     throw error;
   }
 }
