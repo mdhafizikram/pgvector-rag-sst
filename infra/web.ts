@@ -10,7 +10,7 @@ export const viteStaticSite = new sst.aws.StaticSite("IamDplRagWeb", {
     command: "pnpm run build",
     output: "dist",
   },
-  path: "packages/web",
+  path: "packages/client",
   assets: {
     bucket: bucket.name,
   },
