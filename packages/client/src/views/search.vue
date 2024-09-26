@@ -1,9 +1,10 @@
 <template>
   <div class="container">
     <div class="d-flex align-items-center justify-content-center vh-100">
-      <div class="w-50 d-flex flex-column align-self-center">
+      <div class="w-60 d-flex flex-column align-self-center">
         <!-- Left Column: Big Text -->
-        <div class="text-center mb-4">
+        <div class="text-center mb-5
+        ">
           <h1 class="text-lg" style="font-weight: bolder">
             DPL Academic Plan Similarity Search
           </h1>
@@ -57,6 +58,25 @@
                 :close-on-select="true"
               ></vue-multiselect>
             </div>
+
+
+
+
+
+            <div class="col">
+              <vue-multiselect
+                v-model="selectedCount"
+                :options="countOptions"
+                :max-height="120"
+                track-by="value"
+                label="name"
+                :placeholder="
+                  selectedCount ? selectedCount.name : 'Count'
+                "
+                :multiple="false"
+                :close-on-select="true"
+              ></vue-multiselect>
+            </div>
           </div>
 
           <!-- Search Button -->
@@ -71,7 +91,8 @@
                 loading ||
                 !selectedDegreeType ||
                 !selectedAcadPlanType ||
-                !userQuery
+                !userQuery ||
+                !selectedCount
               "
             >
               <template>
@@ -96,6 +117,7 @@ export default {
       text: "",
       userQuery: "",
       selectedDegreeType: null,
+       selectedCount: null,
       acadPlanTypesOptions: [
         { id: 1, name: "MAJ" },
         { id: 2, name: "MIN" },
@@ -112,6 +134,10 @@ export default {
         { id: 3, name: "UGCM" },
         { id: 4, name: "OTHR" },
       ],
+       countOptions: [
+        { value: 5, name: "5" },
+        { value: 10, name: "10" },
+      ],
       selectedAcadPlanType: null,
 
       loading: false, // Toggle during search
@@ -122,7 +148,8 @@ export default {
       this.loading = true;
       const degreeType = this.selectedDegreeType.name;
       const acadPlanType = this.selectedAcadPlanType.name;
-
+      const count = this.selectedCount.value
+      
       await new Promise((resolve) => setTimeout(resolve, 200));
 
       try {
@@ -131,6 +158,7 @@ export default {
           query: {
             degreeType,
             acadPlanType,
+            count,
             q: this.userQuery,
           },
         });

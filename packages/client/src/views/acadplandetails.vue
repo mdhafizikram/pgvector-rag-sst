@@ -36,7 +36,7 @@
           <h5 class="card-subtitle mb-2 text-muted">
             {{ acadPlan.acadPlanCode }}
           </h5>
-          <p>
+          <p v-if="acadPlan.acadPlanMarketingDescription">
             <strong>Marketing Description:</strong>
             {{ acadPlan.acadPlanMarketingDescription }}
           </p>
@@ -49,7 +49,7 @@
             style="background-color: #ebf8ff; border: 2px solid #cbe7f5"
           >
             <div v-html="acadPlan.fullDescription"></div>
-            <p><strong>Type:</strong> {{ acadPlan.acadPlanType }}</p>
+            <p v-if="acadPlan.acadPlanType"><strong>Type:</strong> {{ acadPlan.acadPlanType }}</p>
             <p v-if="acadPlan.acadProgramCode">
               <strong>Program Code:</strong> {{ acadPlan.acadProgramCode }}
             </p>
