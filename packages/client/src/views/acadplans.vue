@@ -29,7 +29,7 @@
             @keydown.enter="handleSearch"
           ></b-form-input>
           <b-form-invalid-feedback :state="!userQuery ? false : null">
-            Please enter your query!
+            Please enter your query
           </b-form-invalid-feedback>
         </div>
 
@@ -123,7 +123,7 @@
                   style="margin-left: 10px"
                   variant="light"
                   size="sm"
-                  @click="fetchReasoning(index, acadPlan.metadata.id)"
+                  @click="toggleReasoning(index, acadPlan.metadata.id)"
                   :disabled="acadPlan.isGettingReason"
                 >
                   <template v-if="acadPlan.isGettingReason">
@@ -132,7 +132,9 @@
                   <template v-else>
                     Why Suggested?
                     <span
-                      :class="acadPlan.reasoning ? 'arrow-up' : 'arrow-down'"
+                      :class="
+                        acadPlan.displayReason ? 'arrow-up' : 'arrow-down'
+                      "
                     ></span>
                   </template>
                 </b-button>
@@ -145,7 +147,10 @@
               </div>
 
               <!-- Reasoning text shown when visible -->
-              <div v-if="acadPlan.reasoning" class="reasoning-div p-2">
+              <div
+                v-if="acadPlan.displayReason && acadPlan.reasoning"
+                class="reasoning-div p-2"
+              >
                 {{ acadPlan.reasoning }}
               </div>
             </div>
@@ -315,6 +320,17 @@ export default {
         this.loading = false;
       }
     },
+    toggleReasoning(index, acadPlanCode) {
+      if (this.acadPlans[index].displayReason) {
+        this.$set(this.acadPlans[index], "displayReason", false);
+      } else {
+        if (!this.acadPlans[index].reasoning) {
+          this.fetchReasoning(index, acadPlanCode);
+        } else {
+          this.$set(this.acadPlans[index], "displayReason", true);
+        }
+      }
+    },
 
     async fetchReasoning(index, acadPlanCode) {
       try {
@@ -334,9 +350,8 @@ export default {
               "reasoning",
               reasoningResponse.data.reasoning
             );
+            this.$set(this.acadPlans[index], "displayReason", true); // Show reasoning
           }
-        } else {
-          this.acadPlans[index].reasoning = "";
         }
       } catch (error) {
         console.error("Error fetching reasoning:", error);
@@ -344,7 +359,6 @@ export default {
         this.$set(this.acadPlans[index], "isGettingReason", false);
       }
     },
-
     goToDetails(acadPlanCode) {
       const selectedPlan = this.acadPlans.find(
         (plan) => plan.metadata.id === acadPlanCode

@@ -172,7 +172,6 @@ async function Similarity_Search(event: APIGatewayEvent) {
     const ret = await client.query({
       vector,
       count: parseInt(count),
-      threshold: 0.76,
       include: {
         type: "acadPlan",
         degreeType,
@@ -226,10 +225,15 @@ async function getReasoning(acadPlanDescription = "", userQuery = "") {
   try {
     const acadPlanReasoningPrompt = `
 		### Role ###
-		Academic Advisor and Educational Consultant
+		Academic Advisor and Educational Consultant responsible for lead/prospect conversion.
 
-		### Scenario: ###
-		You are an academic advisor at Arizona State University. Your task is to explain why the provided academic plan is the best fit for the user's query. Clearly outline the reasoning, focusing on how the plan aligns with the user's goals, strengths, and career aspirations. Address any potential concerns and justify why this plan suits their academic and professional trajectory within 100-150 words.
+    ### Instructions ###
+    - Analyze the academic interest of the student through the provided User Query and understand what the student is emphasizing.
+    - Analyze the provided Academic Plan Description and gather the benefits, outcomes and value it offers.
+    - Ruminate from a student point of view and compose a solid justification/reasoning to opt the particular academic plan within 100-150 words.
+
+    ### Tone ###
+    Formal and Highly Persuasive
 		
 		### Academic Plan Description: ###
 		${acadPlanDescription}
