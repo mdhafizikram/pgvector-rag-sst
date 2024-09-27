@@ -90,74 +90,74 @@
 
     <!-- acadPlans list -->
     <div class="container">
-    <div
-      v-if="acadPlans.length > 0"
-      class="row mt-4 pt-4 d-flex justify-content-center"
-    >
       <div
-        v-for="(acadPlan, index) in acadPlans"
-        :key="index"
-        class="col-md-4 mb-4"
-       
+        v-if="acadPlans.length > 0"
+        class="row mt-4 pt-4 d-flex justify-content-center"
       >
-        <div class="card h-100 shadow fixed-card-size">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center">
-              <h5 class="card-title">
-                {{ acadPlan.metadata.acadPlanDescription }}
-              </h5>
-            </div>
-            <h6 class="card-subtitle mb-2 text-muted">
-              {{ acadPlan.metadata.id }}
-            </h6>
-            <p
-              class="card-text"
-              v-html="acadPlan.metadata.degreeDescriptionText"
-            ></p>
-          </div>
-          <div class="mb-4 mx-3">
-            <div class="d-flex align-items-center">
-              <b-button
-                
-                style="cursor: pointer; font-size:12px"
-                variant="warning"
-                size="sm"
-              
-                @click="goToDetails(acadPlan.metadata.id)"
-                >Learn more
-                <b-icon icon="arrow-right-short"></b-icon>
-              </b-button>
-              <b-button
-                class="wide-button"
-                style="margin-left: 10px"
-                variant="light"
-                size="sm"
-                @click="fetchReasoning(index, acadPlan.metadata.id)"
-                :disabled="acadPlan.isGettingReason"
-              >
-                <template v-if="acadPlan.isGettingReason">
-                  <b-spinner small></b-spinner>
-                </template>
-                <template v-else>
-                  Why Suggested?
-                  <span
-                    :class="acadPlan.reasoning ? 'arrow-up' : 'arrow-down'"
-                  ></span>
-                </template>
-              </b-button>
-              <h6 style="margin-left: 8px; font-size:14px" class="mt-1  text-danger">
-                {{ Math.round(acadPlan.score * 100) }}% match
+        <div
+          v-for="(acadPlan, index) in acadPlans"
+          :key="index"
+          class="col-md-4 mb-4"
+        >
+          <div class="card h-100 shadow fixed-card-size">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title">
+                  {{ acadPlan.metadata.acadPlanDescription }}
+                </h5>
+              </div>
+              <h6 class="card-subtitle mb-2 text-muted">
+                {{ acadPlan.metadata.id }}
               </h6>
+              <p
+                class="card-text"
+                v-html="acadPlan.metadata.degreeDescriptionText"
+              ></p>
             </div>
+            <div class="mb-4 mx-3">
+              <div class="d-flex align-items-center">
+                <b-button
+                  style="cursor: pointer; font-size: 12px"
+                  variant="warning"
+                  size="sm"
+                  @click="goToDetails(acadPlan.metadata.id)"
+                  >Learn more
+                  <b-icon icon="arrow-right-short"></b-icon>
+                </b-button>
+                <b-button
+                  class="wide-button"
+                  style="margin-left: 10px"
+                  variant="light"
+                  size="sm"
+                  @click="fetchReasoning(index, acadPlan.metadata.id)"
+                  :disabled="acadPlan.isGettingReason"
+                >
+                  <template v-if="acadPlan.isGettingReason">
+                    <b-spinner small></b-spinner>
+                  </template>
+                  <template v-else>
+                    Why Suggested?
+                    <span
+                      :class="acadPlan.reasoning ? 'arrow-up' : 'arrow-down'"
+                    ></span>
+                  </template>
+                </b-button>
+                <h6
+                  style="margin-left: 8px; font-size: 14px"
+                  class="mt-1 text-danger"
+                >
+                  {{ Math.round(acadPlan.score * 100) }}% match
+                </h6>
+              </div>
 
-            <!-- Reasoning text shown when visible -->
-            <div v-if="acadPlan.reasoning" class="reasoning-div p-2">
-              {{ acadPlan.reasoning }}
+              <!-- Reasoning text shown when visible -->
+              <div v-if="acadPlan.reasoning" class="reasoning-div p-2">
+                {{ acadPlan.reasoning }}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
 
     <!-- Not found message-->
@@ -178,7 +178,7 @@
             />
           </svg>
         </div>
-        
+
         <!-- Message -->
         <h2>No Academic Plans Found</h2>
         <h6 class="text-muted">Please try changing your query or filters</h6>
@@ -287,7 +287,7 @@ export default {
             prompt: this.userQuery,
             acadPlanType: acadPlanTypeName,
             degreeType: degreeTypeName,
-            count : countValue
+            count: countValue,
           },
         });
 
@@ -299,6 +299,7 @@ export default {
               query: {
                 degreeType: this.selectedDegreeType.name,
                 acadPlanType: this.selectedAcadPlanType.name,
+                count: this.selectedCount.name,
                 q: this.userQuery,
               },
             })
@@ -307,8 +308,6 @@ export default {
           this.checkApiResponse = true;
 
           this.acadPlans = [];
-          console.log("acad", this.acadPlans.length);
-          console.log(this.checkApiResponse);
         }
       } catch (error) {
         console.error("Error fetching acadPlans:", error);
@@ -367,7 +366,6 @@ export default {
 
   mounted() {
     const { degreeType, acadPlanType, count, q } = this.$route.query;
-    console.log("count", count);
 
     // Set the user query
     if (q) {
@@ -391,11 +389,10 @@ export default {
 
     if (count) {
       this.selectedCount =
-        this.countOptions.find((option) => option.value === count) || "";
+        this.countOptions.find((option) => option.name === count) || "";
     }
 
     if (degreeType && acadPlanType && q) {
-      console.log("hitinh handlesarh");
       this.handleSearch();
     }
   },
@@ -468,8 +465,7 @@ export default {
 }
 .wide-button {
   min-width: 120px;
-  font-size:12px
-
+  font-size: 12px;
 }
 
 .dropdown-item {
@@ -496,7 +492,7 @@ export default {
 .card {
   position: relative;
   overflow: visible;
-  width: 340px
+  width: 340px;
 }
 .no-acadplans-card {
   display: flex;

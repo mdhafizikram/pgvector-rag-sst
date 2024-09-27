@@ -148,7 +148,7 @@ export default {
       this.loading = true;
       const degreeType = this.selectedDegreeType.name;
       const acadPlanType = this.selectedAcadPlanType.name;
-      const count = this.selectedCount.value
+      const count = this.selectedCount.name
       
       await new Promise((resolve) => setTimeout(resolve, 200));
 
