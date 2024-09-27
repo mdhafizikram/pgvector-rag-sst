@@ -70,9 +70,9 @@
 
         <!-- Search Button -->
         <div class="search-btn">
-          <b-button  class =" ml-4
-          "
-           style="width: 104%"
+          <b-button
+            class="ml-4"
+            style="width: 104%"
             variant="warning"
             @click="handleSearch"
             :disabled="
@@ -89,15 +89,16 @@
     </div>
 
     <!-- acadPlans list -->
+    <div class="container">
     <div
       v-if="acadPlans.length > 0"
-      class="row mt-4 pt-4"
-      style="margin-left: 80px; margin-right: 80px"
+      class="row mt-4 pt-4 d-flex justify-content-center"
     >
       <div
         v-for="(acadPlan, index) in acadPlans"
         :key="index"
         class="col-md-4 mb-4"
+       
       >
         <div class="card h-100 shadow fixed-card-size">
           <div class="card-body">
@@ -114,72 +115,81 @@
               v-html="acadPlan.metadata.degreeDescriptionText"
             ></p>
           </div>
-          <div class="mb-4 mx-4">
-            <b-button
-              style="cursor: pointer"
-              variant="warning"
-              size="sm"
-              @click="goToDetails(acadPlan.metadata.id)"
-              >Learn more
-              <b-icon icon="arrow-right-short"></b-icon>
-            </b-button>
-            <b-button
-              style="margin-left: 10px"
-              variant="light"
-              size="sm"
-              @click="fetchReasoning(index, acadPlan.metadata.id)"
-              :disabled="acadPlan.isGettingReason"
-            >
-              <template v-if="acadPlan.isGettingReason">
-                <b-spinner small></b-spinner>
-              </template>
-              <template v-else>
-                Why Suggested?
-                <span
-                  :class="acadPlan.reasoning ? 'arrow-up' : 'arrow-down'"
-                ></span>
-              </template>
-            </b-button>
+          <div class="mb-4 mx-3">
+            <div class="d-flex align-items-center">
+              <b-button
+                
+                style="cursor: pointer; font-size:12px"
+                variant="warning"
+                size="sm"
+              
+                @click="goToDetails(acadPlan.metadata.id)"
+                >Learn more
+                <b-icon icon="arrow-right-short"></b-icon>
+              </b-button>
+              <b-button
+                class="wide-button"
+                style="margin-left: 10px"
+                variant="light"
+                size="sm"
+                @click="fetchReasoning(index, acadPlan.metadata.id)"
+                :disabled="acadPlan.isGettingReason"
+              >
+                <template v-if="acadPlan.isGettingReason">
+                  <b-spinner small></b-spinner>
+                </template>
+                <template v-else>
+                  Why Suggested?
+                  <span
+                    :class="acadPlan.reasoning ? 'arrow-up' : 'arrow-down'"
+                  ></span>
+                </template>
+              </b-button>
+              <h6 style="margin-left: 8px; font-size:14px" class="mt-1  text-danger">
+                {{ Math.round(acadPlan.score * 100) }}% match
+              </h6>
+            </div>
+
             <!-- Reasoning text shown when visible -->
             <div v-if="acadPlan.reasoning" class="reasoning-div p-2">
               {{ acadPlan.reasoning }}
             </div>
-
-           <h6 class="mt-3 text-danger">{{ Math.round(acadPlan.score * 100) }}% match</h6>
           </div>
         </div>
       </div>
     </div>
-   
+    </div>
 
-   
-
-
-
-
-
-   <!-- Not found message-->
-<div v-if="this.checkApiResponse" class="no-acadplans-card">
-  <div class="no-acadplans-content">
-    <!-- X-mark icon -->
-    <div class="x-mark-icon">
-   <svg   xmlns="http://www.w3.org/2000/svg" height="40" width="40" viewBox="0 0 384 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>
-   </div>
-    <!-- Message -->
-    <h2>No AcadPlans Found!</h2>
-    <h6 class=" text-muted">Please try changing your query or filters</h6>
-  </div>
-</div>
-
-
-
+    <!-- Not found message-->
+    <div v-if="this.checkApiResponse" class="no-acadplans-card">
+      <div class="no-acadplans-content">
+        <!-- X-mark icon -->
+        <div class="x-mark-icon">
+          <svg
+            style="border: 6px solid black; border-radius: 50px; padding: 2px"
+            xmlns="http://www.w3.org/2000/svg"
+            height="70"
+            width="70"
+            viewBox="0 0 384 512"
+          >
+            <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+            <path
+              d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+            />
+          </svg>
+        </div>
+        
+        <!-- Message -->
+        <h2>No Academic Plans Found</h2>
+        <h6 class="text-muted">Please try changing your query or filters</h6>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import Multiselect from "vue-multiselect";
 import { lambdaInstance } from "../services/axios";
-
 
 export default {
   components: {
@@ -190,7 +200,7 @@ export default {
     return {
       userQuery: "",
       inputFocused: false,
-      checkApiResponse:false,
+      checkApiResponse: false,
 
       selectedDegreeType: "",
       selectedAcadPlanType: "",
@@ -215,7 +225,7 @@ export default {
         { id: 3, name: "UGCM" },
         { id: 4, name: "OTHR" },
       ],
-       countOptions: [
+      countOptions: [
         { value: 5, name: "5" },
         { value: 10, name: "10" },
       ],
@@ -270,19 +280,19 @@ export default {
       this.loading = true;
       const degreeTypeName = this.selectedDegreeType.name;
       const acadPlanTypeName = this.selectedAcadPlanType.name;
-      const countValue = this.selectedCount
+      const countValue = this.selectedCount;
       try {
         const response = await lambdaInstance.get("/similarity-search", {
           params: {
             prompt: this.userQuery,
             acadPlanType: acadPlanTypeName,
             degreeType: degreeTypeName,
-            //count : countValue 
+            count : countValue
           },
         });
 
         if (response.data && response.data.results.length) {
-          console.log(response.data.results.length)
+          console.log(response.data.results.length);
           this.acadPlans = response.data.results;
           this.$router
             .push({
@@ -293,13 +303,12 @@ export default {
               },
             })
             .catch(() => {});
-        }
-        else {
-       
+        } else {
           this.checkApiResponse = true;
-         
-          this.acadPlans =  []
-          
+
+          this.acadPlans = [];
+          console.log("acad", this.acadPlans.length);
+          console.log(this.checkApiResponse);
         }
       } catch (error) {
         console.error("Error fetching acadPlans:", error);
@@ -357,8 +366,8 @@ export default {
   },
 
   mounted() {
-    const { degreeType, acadPlanType, count ,q } = this.$route.query;
-    console.log('count', count)
+    const { degreeType, acadPlanType, count, q } = this.$route.query;
+    console.log("count", count);
 
     // Set the user query
     if (q) {
@@ -380,12 +389,13 @@ export default {
         ) || "";
     }
 
-    if(count){
-      this.selectedCount =  this.countOptions.find( (option)=> option.value === count) || "";
+    if (count) {
+      this.selectedCount =
+        this.countOptions.find((option) => option.value === count) || "";
     }
 
-    if (degreeType && acadPlanType && q && count) {
-      console.log('hitinh handlesarh')
+    if (degreeType && acadPlanType && q) {
+      console.log("hitinh handlesarh");
       this.handleSearch();
     }
   },
@@ -456,6 +466,11 @@ export default {
   width: 100%;
   border-radius: 90px;
 }
+.wide-button {
+  min-width: 120px;
+  font-size:12px
+
+}
 
 .dropdown-item {
   width: 20%;
@@ -481,14 +496,13 @@ export default {
 .card {
   position: relative;
   overflow: visible;
+  width: 340px
 }
 .no-acadplans-card {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  
-
 }
 
 .no-acadplans-content {
@@ -498,11 +512,12 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-align: center;
   width: 40%;
+  height: 300px;
 }
 
 .x-mark-icon {
   color: #dc3545;
   margin-bottom: 20px;
+  margin-top: 40px;
 }
-
 </style>
