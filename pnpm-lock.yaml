@@ -19,6 +19,40 @@ importers:
         specifier: 5.3.3
         version: 5.3.3
 
+  packages/client:
+    dependencies:
+      axios:
+        specifier: ^1.7.7
+        version: 1.7.7
+      bootstrap:
+        specifier: ^4.6.2
+        version: 4.6.2(jquery@3.7.1)(popper.js@1.16.1)
+      bootstrap-vue:
+        specifier: ^2.23.1
+        version: 2.23.1(jquery@3.7.1)(vue@2.7.16)
+      vite-plugin-vue2:
+        specifier: ^2.0.3
+        version: 2.0.3(vite@5.4.5(@types/node@20.16.5))(vue-template-compiler@2.7.16)(vue@2.7.16)
+      vue:
+        specifier: ^2.7.16
+        version: 2.7.16
+      vue-multiselect:
+        specifier: ^2.1.6
+        version: 2.1.9
+      vue-router:
+        specifier: ^3.6.5
+        version: 3.6.5(vue@2.7.16)
+      vue-template-compiler:
+        specifier: ^2.7.16
+        version: 2.7.16
+    devDependencies:
+      '@vitejs/plugin-vue':
+        specifier: ^5.1.2
+        version: 5.1.4(vite@5.4.5(@types/node@20.16.5))(vue@2.7.16)
+      vite:
+        specifier: ^5.4.1
+        version: 5.4.5(@types/node@20.16.5)
+
   packages/core:
     dependencies:
       sst:

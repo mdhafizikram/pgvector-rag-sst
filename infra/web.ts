@@ -14,4 +14,7 @@ export const viteStaticSite = new sst.aws.StaticSite("IamDplRagWeb", {
   assets: {
     bucket: bucket.name,
   },
+  dev: {
+    command: "pnpm run dev",
+  },
 });

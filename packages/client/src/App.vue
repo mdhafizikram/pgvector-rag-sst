@@ -18,5 +18,6 @@ export default {
 .html,
 body {
   background-color: #ebf8ff !important;
+  height: 100vh;
 }
 </style>

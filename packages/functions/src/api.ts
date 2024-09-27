@@ -1,4 +1,5 @@
-import { Handler, APIGatewayEvent } from "aws-lambda";
+import { Handler } from "aws-lambda/handler.js";
+import { APIGatewayEvent } from "aws-lambda/trigger/api-gateway-proxy.js";
 import { OpenAI } from "openai";
 import { VectorClient, Resource } from "sst";
 const client = VectorClient("dplAPVectorDB");
@@ -171,7 +172,7 @@ async function Similarity_Search(event: APIGatewayEvent) {
     const ret = await client.query({
       vector,
       count: parseInt(count),
-      threshold: 0.7,
+      threshold: 0.76,
       include: {
         type: "acadPlan",
         degreeType,

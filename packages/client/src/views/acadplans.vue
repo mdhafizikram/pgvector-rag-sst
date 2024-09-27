@@ -26,6 +26,7 @@
             placeholder="I'm interested in Computer science..."
             aria-label="User query"
             :state="!userQuery ? false : null"
+            @keydown.enter="handleSearch"
           ></b-form-input>
           <b-form-invalid-feedback :state="!userQuery ? false : null">
             Please enter your query!
@@ -75,31 +76,26 @@
             style="width: 104%"
             variant="warning"
             @click="handleSearch"
-            :disabled="
-              loading ||
-              !selectedDegreeType ||
-              !selectedAcadPlanType ||
-              !userQuery
-            "
+            :disabled="isSearchDisabled"
           >
-            Search
+            <span v-if="loading">
+              <b-spinner small></b-spinner>
+            </span>
+            <span v-else>Search</span>
           </b-button>
         </div>
       </div>
     </div>
 
     <!-- acadPlans list -->
-    <div class="container">
-      <div
-        v-if="acadPlans.length > 0"
-        class="row mt-4 pt-4 d-flex justify-content-center"
-      >
+    <div class="mx-5 fluid">
+      <div v-if="acadPlans.length > 0" class="row mt-4 pt-4">
         <div
           v-for="(acadPlan, index) in acadPlans"
           :key="index"
-          class="col-md-4 mb-4"
+          class="col-4 mb-4"
         >
-          <div class="card h-100 shadow fixed-card-size">
+          <div class="card h-100 shadow">
             <div class="card-body">
               <div class="d-flex justify-content-between align-items-center">
                 <h5 class="card-title">
@@ -115,9 +111,8 @@
               ></p>
             </div>
             <div class="mb-4 mx-3">
-              <div class="d-flex align-items-center">
+              <div class="d-flex align-items-center text-nowrap">
                 <b-button
-                  style="cursor: pointer; font-size: 12px"
                   variant="warning"
                   size="sm"
                   @click="goToDetails(acadPlan.metadata.id)"
@@ -125,7 +120,6 @@
                   <b-icon icon="arrow-right-short"></b-icon>
                 </b-button>
                 <b-button
-                  class="wide-button"
                   style="margin-left: 10px"
                   variant="light"
                   size="sm"
@@ -143,8 +137,8 @@
                   </template>
                 </b-button>
                 <h6
-                  style="margin-left: 8px; font-size: 14px"
-                  class="mt-1 text-danger"
+                  style="margin-left: 8px"
+                  class="mt-1 text-danger font-weight-bold"
                 >
                   {{ Math.round(acadPlan.score * 100) }}% match
                 </h6>
@@ -158,30 +152,28 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Not found message-->
-    <div v-if="this.checkApiResponse" class="no-acadplans-card">
-      <div class="no-acadplans-content">
-        <!-- X-mark icon -->
-        <div class="x-mark-icon">
+      <!-- Not found message-->
+      <div
+        v-else-if="
+          checkApiResponse && !acadPlans.length && !loading && userQuery
+        "
+        class="no-acadplans-card"
+      >
+        <div class="bg-white p-5 text-center">
           <svg
-            style="border: 6px solid black; border-radius: 50px; padding: 2px"
             xmlns="http://www.w3.org/2000/svg"
-            height="70"
-            width="70"
-            viewBox="0 0 384 512"
+            width="100"
+            height="100"
+            viewBox="0 0 24 24"
           >
-            <!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
             <path
-              d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"
+              d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5 15.538l-3.592-3.548 3.546-3.587-1.416-1.403-3.545 3.589-3.588-3.543-1.405 1.405 3.593 3.552-3.547 3.592 1.405 1.405 3.555-3.596 3.591 3.55 1.403-1.416z"
             />
           </svg>
+          <h2 class="mt-4">No Academic Plans Found</h2>
+          <h6 class="text-muted">Please try changing your query or filters</h6>
         </div>
-
-        <!-- Message -->
-        <h2>No Academic Plans Found</h2>
-        <h6 class="text-muted">Please try changing your query or filters</h6>
       </div>
     </div>
   </div>
@@ -226,8 +218,8 @@ export default {
         { id: 4, name: "OTHR" },
       ],
       countOptions: [
-        { value: 5, name: "5" },
-        { value: 10, name: "10" },
+        { id: 1, name: "5" },
+        { id: 2, name: "10" },
       ],
       watch: {
         // Watch for changes in the route query parame (Need to fix)
@@ -267,6 +259,15 @@ export default {
     showReasonButton() {
       return Object.keys(this.$route.query).length;
     },
+    isSearchDisabled() {
+      return (
+        this.loading ||
+        !this.selectedDegreeType ||
+        !this.selectedAcadPlanType ||
+        !this.userQuery ||
+        !this.selectedCount
+      );
+    },
   },
 
   methods: {
@@ -277,10 +278,12 @@ export default {
     },
 
     async handleSearch() {
+      if (this.isSearchDisabled) return;
+
       this.loading = true;
       const degreeTypeName = this.selectedDegreeType.name;
       const acadPlanTypeName = this.selectedAcadPlanType.name;
-      const countValue = this.selectedCount;
+      const countValue = this.selectedCount.name;
       try {
         const response = await lambdaInstance.get("/similarity-search", {
           params: {
@@ -292,18 +295,15 @@ export default {
         });
 
         if (response.data && response.data.results.length) {
-          console.log(response.data.results.length);
           this.acadPlans = response.data.results;
-          this.$router
-            .push({
-              query: {
-                degreeType: this.selectedDegreeType.name,
-                acadPlanType: this.selectedAcadPlanType.name,
-                count: this.selectedCount.name,
-                q: this.userQuery,
-              },
-            })
-            .catch(() => {});
+          this.$router.push({
+            query: {
+              degreeType: this.selectedDegreeType.name,
+              acadPlanType: this.selectedAcadPlanType.name,
+              resultCount: this.selectedCount.name,
+              q: this.userQuery,
+            },
+          });
         } else {
           this.checkApiResponse = true;
 
@@ -365,7 +365,7 @@ export default {
   },
 
   mounted() {
-    const { degreeType, acadPlanType, count, q } = this.$route.query;
+    const { degreeType, acadPlanType, resultCount, q } = this.$route.query;
 
     // Set the user query
     if (q) {
@@ -387,12 +387,12 @@ export default {
         ) || "";
     }
 
-    if (count) {
+    if (resultCount) {
       this.selectedCount =
-        this.countOptions.find((option) => option.name === count) || "";
+        this.countOptions.find((option) => option.name === resultCount) || "";
     }
 
-    if (degreeType && acadPlanType && q) {
+    if (degreeType && acadPlanType && q && resultCount) {
       this.handleSearch();
     }
   },
@@ -419,13 +419,6 @@ export default {
   font-size: 1.2rem;
   margin-top: 10px;
 }
-.background-container {
-  padding: 20px;
-  border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
 
 .search-header {
   text-align: left;
@@ -446,12 +439,6 @@ export default {
   background-color: #ffff;
 }
 
-.move-top {
-  justify-content: flex-start;
-  height: auto;
-  padding-top: 20px;
-}
-
 .input-bar {
   width: 35%;
   margin-right: 10px;
@@ -462,10 +449,6 @@ export default {
   justify-content: space-between;
   width: 100%;
   border-radius: 90px;
-}
-.wide-button {
-  min-width: 120px;
-  font-size: 12px;
 }
 
 .dropdown-item {
@@ -492,7 +475,7 @@ export default {
 .card {
   position: relative;
   overflow: visible;
-  width: 340px;
+  width: 380px;
 }
 .no-acadplans-card {
   display: flex;

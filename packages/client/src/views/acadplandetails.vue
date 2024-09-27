@@ -28,10 +28,11 @@
         </div>
 
         <!-- Reasoning text shown when visible -->
-        <div v-if="reason" class="reasoning-div p-3 mt-2">
+        <div v-if="reason" class="reasoning-div p-3 mt-3">
           {{ this.reason }}
         </div>
-        <div class="card-body pt-4">
+
+        <div class="card-body pt-4" v-if="!pageLoader">
           <h3 class="card-title mb-3">{{ acadPlan.acadPlanDescription }}</h3>
           <h5 class="card-subtitle mb-2 text-muted">
             {{ acadPlan.acadPlanCode }}
@@ -49,7 +50,9 @@
             style="background-color: #ebf8ff; border: 2px solid #cbe7f5"
           >
             <div v-html="acadPlan.fullDescription"></div>
-            <p v-if="acadPlan.acadPlanType"><strong>Type:</strong> {{ acadPlan.acadPlanType }}</p>
+            <p v-if="acadPlan.acadPlanType">
+              <strong>Type:</strong> {{ acadPlan.acadPlanType }}
+            </p>
             <p v-if="acadPlan.acadProgramCode">
               <strong>Program Code:</strong> {{ acadPlan.acadProgramCode }}
             </p>
