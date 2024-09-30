@@ -88,80 +88,80 @@
     </div>
 
     <!-- acadPlans list -->
-  
-<!-- acadPlans list -->
-<div class="container-fluid">
-  <div
-    v-if="acadPlans.length > 0"
-    class="row mt-4 pt-4 justify-content-center"
-    style="margin-left: auto; margin-right: auto"
-  >
-    <div
-      v-for="(acadPlan, index) in acadPlans"
-      :key="index"
-      class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4 d-flex"
-    >
-      <div class="card h-100 shadow w-100 d-flex flex-column">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
-            <h5 class="card-title">
-              {{ acadPlan.metadata.acadPlanDescription }}
-            </h5>
-          </div>
-          <h6 class="card-subtitle mb-2 text-muted">
-            {{ acadPlan.metadata.id }}
-          </h6>
-          <p class="card-text" v-html="acadPlan.metadata.degreeDescriptionText"></p>
-        </div>
-        <div class="mt-auto mb-4 mx-3">
-          <div class="d-flex align-items-center text-nowrap">
-            <!-- Learn More Button -->
-            <b-button
-              variant="warning"
-              size="sm"
-              @click="goToDetails(acadPlan.metadata.id)"
-              >Learn more
-              <b-icon icon="arrow-right-short"></b-icon>
-            </b-button>
+    <!-- <div class="container-fluid">
+      <div
+        v-if="acadPlans.length > 0"
+        class="row mt-4 pt-4 justify-content-center"
+        style="margin-left: auto; margin-right: auto"
+      >
+        <div
+          v-for="(acadPlan, index) in acadPlans"
+          :key="index"
+          class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4 d-flex"
+        >
+          <div class="card h-100 shadow w-100 d-flex flex-column">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center">
+                <h5 class="card-title">
+                  {{ acadPlan.metadata.acadPlanDescription }}
+                </h5>
+              </div>
+              <h6 class="card-subtitle mb-2 text-muted">
+                {{ acadPlan.metadata.id }}
+              </h6>
+              <p
+                class="card-text"
+                v-html="acadPlan.metadata.degreeDescriptionText"
+              ></p>
+            </div>
+            <div class="mt-auto mb-4 mx-3">
+              <div class="d-flex align-items-center text-nowrap">
+                <b-button
+                  variant="warning"
+                  size="sm"
+                  @click="goToDetails(acadPlan.metadata.id)"
+                  >Learn more
+                  <b-icon icon="arrow-right-short"></b-icon>
+                </b-button>
 
-            <!-- Why Suggested Button -->
-            <b-button
-              style="margin-left: 10px"
-              variant="light"
-              size="sm"
-              @click="toggleReasoning(index, acadPlan.metadata.id)"
-              :disabled="acadPlan.isGettingReason"
-            >
-              <template v-if="acadPlan.isGettingReason">
-                <b-spinner small></b-spinner>
-              </template>
-              <template v-else>
-                Why Suggested?
-                <span :class="acadPlan.displayReason ? 'arrow-up' : 'arrow-down'"></span>
-              </template>
-            </b-button>
+                <b-button
+                  style="margin-left: 10px"
+                  variant="light"
+                  size="sm"
+                  @click="toggleReasoning(index, acadPlan.metadata.id)"
+                  :disabled="acadPlan.isGettingReason"
+                >
+                  <template v-if="acadPlan.isGettingReason">
+                    <b-spinner small></b-spinner>
+                  </template>
+                  <template v-else>
+                    Why Suggested?
+                    <span
+                      :class="
+                        acadPlan.displayReason ? 'arrow-up' : 'arrow-down'
+                      "
+                    ></span>
+                  </template>
+                </b-button>
 
-            <!-- Score beside buttons -->
-            <h6
-              style="margin-left: 8px"
-              class="mt-1 text-danger font-weight-bold"
-            >
-              {{ Math.round(acadPlan.score * 100) }}% match
-            </h6>
-          </div>
+                <h6
+                  style="margin-left: 8px"
+                  class="mt-1 text-danger font-weight-bold"
+                >
+                  {{ Math.round(acadPlan.score * 100) }}% match
+                </h6>
+              </div>
 
-          <!-- Reasoning text shown when visible -->
-          <div
-            v-if="acadPlan.displayReason && acadPlan.reasoning"
-            class="reasoning-div p-2"
-          >
-            {{ acadPlan.reasoning }}
+              <div
+                v-if="acadPlan.displayReason && acadPlan.reasoning"
+                class="reasoning-div p-2"
+              >
+                {{ acadPlan.reasoning }}
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </div>
-      <!-- Not found message-->
       <div
         v-else-if="
           checkApiResponse && !acadPlans.length && !loading && userQuery
@@ -183,7 +183,27 @@
           <h6 class="text-muted">Please try changing your query or filters</h6>
         </div>
       </div>
-    </div>
+    </div> -->
+
+    <!-- acadPlans list -->
+    <b-container fluid class="mt-4">
+      <b-row :cols-xl="getColCount" no-gutters align-h="start">
+        <b-col
+          v-for="(acadPlan, index) in acadPlans"
+          :key="index"
+          class="mb-4"
+          cols="12"
+        >
+          <b-card>
+            <b-card-title>{{ acadPlan.title }}</b-card-title>
+            <b-card-text>{{ acadPlan.description }}</b-card-text>
+            <b-button @click="goToDetails(acadPlan.metadata.id)"
+              >Details</b-button
+            >
+          </b-card>
+        </b-col>
+      </b-row>
+    </b-container>
   </div>
 </template>
 
@@ -276,6 +296,9 @@ export default {
         !this.selectedCount
       );
     },
+    getColCount() {
+      return window.innerWidth > 1400 ? 4 : 3;
+    },
   },
 
   methods: {
@@ -305,17 +328,16 @@ export default {
         if (response.data && response.data.results.length) {
           this.acadPlans = response.data.results;
           const currentQuery = this.$route.query;
-      const newQuery = {
-        degreeType: this.selectedDegreeType.name,
-        acadPlanType: this.selectedAcadPlanType.name,
-        resultCount: this.selectedCount.name,
-        q: this.userQuery,
-      };
-       if (JSON.stringify(currentQuery) !== JSON.stringify(newQuery)) {
-        // Only navigate if the query has changed
-        this.$router.push({ query: newQuery });
-      }
-         
+          const newQuery = {
+            degreeType: this.selectedDegreeType.name,
+            acadPlanType: this.selectedAcadPlanType.name,
+            resultCount: this.selectedCount.name,
+            q: this.userQuery,
+          };
+          if (JSON.stringify(currentQuery) !== JSON.stringify(newQuery)) {
+            // Only navigate if the query has changed
+            this.$router.push({ query: newQuery });
+          }
         } else {
           this.checkApiResponse = true;
 
