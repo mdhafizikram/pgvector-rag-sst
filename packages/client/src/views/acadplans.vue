@@ -88,76 +88,79 @@
     </div>
 
     <!-- acadPlans list -->
-    <div class="mx-5 fluid">
-      <div v-if="acadPlans.length > 0" class="row mt-4 pt-4">
-        <div
-          v-for="(acadPlan, index) in acadPlans"
-          :key="index"
-          class="col-4 mb-4"
-        >
-          <div class="card h-100 shadow">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center">
-                <h5 class="card-title">
-                  {{ acadPlan.metadata.acadPlanDescription }}
-                </h5>
-              </div>
-              <h6 class="card-subtitle mb-2 text-muted">
-                {{ acadPlan.metadata.id }}
-              </h6>
-              <p
-                class="card-text"
-                v-html="acadPlan.metadata.degreeDescriptionText"
-              ></p>
-            </div>
-            <div class="mb-4 mx-3">
-              <div class="d-flex align-items-center text-nowrap">
-                <b-button
-                  variant="warning"
-                  size="sm"
-                  @click="goToDetails(acadPlan.metadata.id)"
-                  >Learn more
-                  <b-icon icon="arrow-right-short"></b-icon>
-                </b-button>
-                <b-button
-                  style="margin-left: 10px"
-                  variant="light"
-                  size="sm"
-                  @click="toggleReasoning(index, acadPlan.metadata.id)"
-                  :disabled="acadPlan.isGettingReason"
-                >
-                  <template v-if="acadPlan.isGettingReason">
-                    <b-spinner small></b-spinner>
-                  </template>
-                  <template v-else>
-                    Why Suggested?
-                    <span
-                      :class="
-                        acadPlan.displayReason ? 'arrow-up' : 'arrow-down'
-                      "
-                    ></span>
-                  </template>
-                </b-button>
-                <h6
-                  style="margin-left: 8px"
-                  class="mt-1 text-danger font-weight-bold"
-                >
-                  {{ Math.round(acadPlan.score * 100) }}% match
-                </h6>
-              </div>
+  
+<!-- acadPlans list -->
+<div class="container-fluid">
+  <div
+    v-if="acadPlans.length > 0"
+    class="row mt-4 pt-4 justify-content-center"
+    style="margin-left: auto; margin-right: auto"
+  >
+    <div
+      v-for="(acadPlan, index) in acadPlans"
+      :key="index"
+      class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4 d-flex"
+    >
+      <div class="card h-100 shadow w-100 d-flex flex-column">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title">
+              {{ acadPlan.metadata.acadPlanDescription }}
+            </h5>
+          </div>
+          <h6 class="card-subtitle mb-2 text-muted">
+            {{ acadPlan.metadata.id }}
+          </h6>
+          <p class="card-text" v-html="acadPlan.metadata.degreeDescriptionText"></p>
+        </div>
+        <div class="mt-auto mb-4 mx-3">
+          <div class="d-flex align-items-center text-nowrap">
+            <!-- Learn More Button -->
+            <b-button
+              variant="warning"
+              size="sm"
+              @click="goToDetails(acadPlan.metadata.id)"
+              >Learn more
+              <b-icon icon="arrow-right-short"></b-icon>
+            </b-button>
 
-              <!-- Reasoning text shown when visible -->
-              <div
-                v-if="acadPlan.displayReason && acadPlan.reasoning"
-                class="reasoning-div p-2"
-              >
-                {{ acadPlan.reasoning }}
-              </div>
-            </div>
+            <!-- Why Suggested Button -->
+            <b-button
+              style="margin-left: 10px"
+              variant="light"
+              size="sm"
+              @click="toggleReasoning(index, acadPlan.metadata.id)"
+              :disabled="acadPlan.isGettingReason"
+            >
+              <template v-if="acadPlan.isGettingReason">
+                <b-spinner small></b-spinner>
+              </template>
+              <template v-else>
+                Why Suggested?
+                <span :class="acadPlan.displayReason ? 'arrow-up' : 'arrow-down'"></span>
+              </template>
+            </b-button>
+
+            <!-- Score beside buttons -->
+            <h6
+              style="margin-left: 8px"
+              class="mt-1 text-danger font-weight-bold"
+            >
+              {{ Math.round(acadPlan.score * 100) }}% match
+            </h6>
+          </div>
+
+          <!-- Reasoning text shown when visible -->
+          <div
+            v-if="acadPlan.displayReason && acadPlan.reasoning"
+            class="reasoning-div p-2"
+          >
+            {{ acadPlan.reasoning }}
           </div>
         </div>
       </div>
-
+    </div>
+  </div>
       <!-- Not found message-->
       <div
         v-else-if="
@@ -301,14 +304,18 @@ export default {
 
         if (response.data && response.data.results.length) {
           this.acadPlans = response.data.results;
-          this.$router.push({
-            query: {
-              degreeType: this.selectedDegreeType.name,
-              acadPlanType: this.selectedAcadPlanType.name,
-              resultCount: this.selectedCount.name,
-              q: this.userQuery,
-            },
-          });
+          const currentQuery = this.$route.query;
+      const newQuery = {
+        degreeType: this.selectedDegreeType.name,
+        acadPlanType: this.selectedAcadPlanType.name,
+        resultCount: this.selectedCount.name,
+        q: this.userQuery,
+      };
+       if (JSON.stringify(currentQuery) !== JSON.stringify(newQuery)) {
+        // Only navigate if the query has changed
+        this.$router.push({ query: newQuery });
+      }
+         
         } else {
           this.checkApiResponse = true;
 
