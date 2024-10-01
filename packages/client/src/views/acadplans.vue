@@ -114,7 +114,7 @@
             </div>
 
             <!-- Fixed Button and Match Percentage Section at Bottom -->
-            <template #footer class="card-footer">
+            <template #footer>
               <div class="d-flex align-items-center text-nowrap">
                 <!-- 'mt-auto' pushes this section to bottom -->
                 <b-button
@@ -126,7 +126,7 @@
                 </b-button>
 
                 <b-button
-                  style="margin-left: 10px"
+                  style="margin-left: 5px"
                   variant="light"
                   size="sm"
                   @click="toggleReasoning(index, acadPlan.metadata.id)"
@@ -146,7 +146,7 @@
                 </b-button>
 
                 <h6
-                  style="margin-left: 8px"
+                  style="margin-left: 5px"
                   class="mt-1 text-danger font-weight-bold"
                 >
                   {{ Math.round(acadPlan.score * 100) }}% match
@@ -231,7 +231,7 @@ export default {
         { id: 1, name: "5" },
         { id: 2, name: "10" },
       ],
-
+    };
   },
 
   computed: {
@@ -251,7 +251,7 @@ export default {
       );
     },
     getColCount() {
-      return window.innerWidth > 1366 ? 5 : 3;
+      return window.innerWidth > 1366 ? 4 : 3;
     },
   },
 
