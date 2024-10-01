@@ -88,40 +88,41 @@
     </div>
 
     <!-- acadPlans list -->
-    <!-- <div class="container-fluid">
-      <div
-        v-if="acadPlans.length > 0"
-        class="row mt-4 pt-4 justify-content-center"
-        style="margin-left: auto; margin-right: auto"
-      >
-        <div
+    <b-container fluid class="mt-4">
+      <b-row :cols-xl="getColCount" no-gutters align-h="start">
+        <b-col
           v-for="(acadPlan, index) in acadPlans"
           :key="index"
-          class="col-12 col-sm-6 col-md-4 col-lg-4 mb-4 d-flex"
+          class="mb-4"
+          cols="12"
         >
-          <div class="card h-100 shadow w-100 d-flex flex-column">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center">
-                <h5 class="card-title">
-                  {{ acadPlan.metadata.acadPlanDescription }}
-                </h5>
-              </div>
-              <h6 class="card-subtitle mb-2 text-muted">
-                {{ acadPlan.metadata.id }}
-              </h6>
-              <p
-                class="card-text"
-                v-html="acadPlan.metadata.degreeDescriptionText"
-              ></p>
+          <b-card class="d-flex flex-column h-100">
+            <!-- Card takes full height -->
+
+            <!-- Content Area -->
+            <div class="flex-grow-1">
+              <!-- This div grows to fill available space -->
+              <b-card-title>{{
+                acadPlan.metadata.acadPlanDescription
+              }}</b-card-title>
+              <b-card-text class="text-muted">{{
+                acadPlan.metadata.id
+              }}</b-card-text>
+              <b-card-text>{{
+                acadPlan.metadata.degreeDescriptionText
+              }}</b-card-text>
             </div>
-            <div class="mt-auto mb-4 mx-3">
+
+            <!-- Fixed Button and Match Percentage Section at Bottom -->
+            <template #footer class="card-footer">
               <div class="d-flex align-items-center text-nowrap">
+                <!-- 'mt-auto' pushes this section to bottom -->
                 <b-button
                   variant="warning"
                   size="sm"
                   @click="goToDetails(acadPlan.metadata.id)"
-                  >Learn more
-                  <b-icon icon="arrow-right-short"></b-icon>
+                >
+                  Learn more <b-icon icon="arrow-right-short"></b-icon>
                 </b-button>
 
                 <b-button
@@ -151,59 +152,40 @@
                   {{ Math.round(acadPlan.score * 100) }}% match
                 </h6>
               </div>
+            </template>
 
-              <div
-                v-if="acadPlan.displayReason && acadPlan.reasoning"
-                class="reasoning-div p-2"
-              >
-                {{ acadPlan.reasoning }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div
-        v-else-if="
-          checkApiResponse && !acadPlans.length && !loading && userQuery
-        "
-        class="no-acadplans-card"
-      >
-        <div class="bg-white p-5 text-center">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="100"
-            height="100"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5 15.538l-3.592-3.548 3.546-3.587-1.416-1.403-3.545 3.589-3.588-3.543-1.405 1.405 3.593 3.552-3.547 3.592 1.405 1.405 3.555-3.596 3.591 3.55 1.403-1.416z"
-            />
-          </svg>
-          <h2 class="mt-4">No Academic Plans Found</h2>
-          <h6 class="text-muted">Please try changing your query or filters</h6>
-        </div>
-      </div>
-    </div> -->
-
-    <!-- acadPlans list -->
-    <b-container fluid class="mt-4">
-      <b-row :cols-xl="getColCount" no-gutters align-h="start">
-        <b-col
-          v-for="(acadPlan, index) in acadPlans"
-          :key="index"
-          class="mb-4"
-          cols="12"
-        >
-          <b-card>
-            <b-card-title>{{ acadPlan.title }}</b-card-title>
-            <b-card-text>{{ acadPlan.description }}</b-card-text>
-            <b-button @click="goToDetails(acadPlan.metadata.id)"
-              >Details</b-button
+            <!-- Reasoning Section -->
+            <div
+              v-if="acadPlan.displayReason && acadPlan.reasoning"
+              class="reasoning-div p-2"
             >
+              {{ acadPlan.reasoning }}
+            </div>
           </b-card>
         </b-col>
       </b-row>
     </b-container>
+
+    <!-- NO acadplans found message-->
+    <div
+      v-if="checkApiResponse && !acadPlans.length && !loading && userQuery"
+      class="no-acadplans-card"
+    >
+      <div class="bg-white p-5 text-center">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="100"
+          height="100"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm5 15.538l-3.592-3.548 3.546-3.587-1.416-1.403-3.545 3.589-3.588-3.543-1.405 1.405 3.593 3.552-3.547 3.592 1.405 1.405 3.555-3.596 3.591 3.55 1.403-1.416z"
+          />
+        </svg>
+        <h2 class="mt-4">No Academic Plans Found</h2>
+        <h6 class="text-muted">Please try changing your query or filters</h6>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -249,40 +231,12 @@ export default {
         { id: 1, name: "5" },
         { id: 2, name: "10" },
       ],
-      watch: {
-        // Watch for changes in the route query parame (Need to fix)
-        "$route.query": {
-          immediate: true,
-          handler(newQuery) {
-            // Update the degree type dropdown if the query parameter changes
-            if (newQuery.degreeType) {
-              this.selectedDegreeType =
-                this.degreeTypeOptions.find(
-                  (option) => option.name === newQuery.degreeType
-                ) || "";
-            }
 
-            // Update the math intensity dropdown
-            if (newQuery.acadPlanType) {
-              this.selectedAcadPlanType =
-                this.acadPlanTypesOptions.find(
-                  (option) => option.name === newQuery.acadPlanType
-                ) || "";
-            }
-
-            // Update the search query text input
-            if (newQuery.q) {
-              this.userQuery = newQuery.q;
-            }
-          },
-        },
-      },
-    };
   },
 
   computed: {
     isCentered() {
-      return !this.acadPlans.length; // True when acadPlans is not visible
+      return !this.acadPlans.length;
     },
     showReasonButton() {
       return Object.keys(this.$route.query).length;
@@ -297,7 +251,7 @@ export default {
       );
     },
     getColCount() {
-      return window.innerWidth > 1400 ? 4 : 3;
+      return window.innerWidth > 1366 ? 5 : 3;
     },
   },
 
@@ -514,6 +468,10 @@ export default {
 
   transition: all 0.3s ease-in-out;
   margin-top: 12px;
+}
+.card-footer {
+  background-color: white !important;
+  border-top: 0 !important;
 }
 .card {
   position: relative;
