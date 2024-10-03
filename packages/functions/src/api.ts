@@ -156,7 +156,7 @@ async function Similarity_Search(event: APIGatewayEvent) {
 
     if (!queryParams) {
       return {
-        statusCode: 400,
+        statusCode: 200,
         body: "Bad Request - Missing query string parameters.",
       };
     }
@@ -166,6 +166,16 @@ async function Similarity_Search(event: APIGatewayEvent) {
       return {
         statusCode: 400,
         body: "Bad Request - Missing required parameters in the query string.",
+      };
+    }
+    const isPromptValid = await promptValidation(prompt);
+
+    if (!isPromptValid) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({
+          message: "Invalid prompt - does not meet the required criteria.",
+        }),
       };
     }
 
@@ -220,6 +230,71 @@ async function generateEmbeddingOpenAI(text: string) {
     return embeddingResponse.data[0].embedding;
   } catch (error) {
     console.log("Error generating embedding:", error);
+    throw error;
+  }
+}
+
+async function promptValidation(userQuery = "") {
+  try {
+    const validationPrompt = `
+      ### Role ###
+      AI Validator responsible for checking if the user query meets content guidelines.
+
+      ### Instructions ###
+      - The User Query should be focused on the student's interest to take up course. 
+      - The User Query should be  as per student's perspective . Possible query's student might ask.
+      - The User Query must not contain destructive content (e.g., harmful, violent, illegal, offensive, etc.).
+      - The User Query should not be a lame or non-sensible question.
+    
+      - If the User Query meets these conditions, return "true".
+      - If the User Query violates any of the conditions, return "false".
+
+      ### User Query: ###
+      ${userQuery}
+    `;
+
+    const validationResult = await openAi.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Evaluate the user query for validity based on the conditions provided and return the result in JSON format.",
+        },
+        { role: "user", content: validationPrompt },
+      ],
+      max_tokens: 100,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "validationResult",
+          description: "The validation result for the user query.",
+          schema: {
+            type: "object",
+            properties: {
+              isValid: {
+                type: "boolean",
+                description:
+                  "Indicates whether the user query is valid (true) or invalid (false).",
+              },
+            },
+            additionalProperties: false,
+            required: ["isValid"],
+          },
+          strict: true,
+        },
+      },
+    });
+
+    const content = validationResult.choices[0].message.content;
+    if (content === null) {
+      throw new Error("Received null content from OpenAI response");
+    }
+    const validationResponse = JSON.parse(content);
+
+    return validationResponse.isValid;
+  } catch (error) {
+    console.log(`Error validating prompt:`, error);
     throw error;
   }
 }
