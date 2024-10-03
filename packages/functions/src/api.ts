@@ -110,25 +110,27 @@ async function seeder({ start, end }: { start: number; end: number }) {
         ...rest
       } = acadPlan;
 
-      const combinedDescription = `fullDescription:${fullDescription} | careerOpportunities:${careerOpportunities} | globalExperienceText:${globalExperienceText}`;
+      if (fullDescription || careerOpportunities || globalExperienceText) {
+        const combinedDescription = `fullDescription:${fullDescription} | careerOpportunities:${careerOpportunities} | globalExperienceText:${globalExperienceText}`;
 
-      try {
-        const vector = await generateEmbeddingOpenAI(combinedDescription);
+        try {
+          const vector = await generateEmbeddingOpenAI(combinedDescription);
 
-        return client.put({
-          vector,
-          metadata: {
-            type: "acadPlan",
-            id: acadPlanCode,
-            fullDescription,
-            careerOpportunities,
-            globalExperienceText,
-            ...rest,
-          },
-        });
-      } catch (error) {
-        console.log(`Error processing acadPlanCode ${acadPlanCode}:`, error);
-        throw error;
+          return client.put({
+            vector,
+            metadata: {
+              type: "acadPlan",
+              id: acadPlanCode,
+              fullDescription,
+              careerOpportunities,
+              globalExperienceText,
+              ...rest,
+            },
+          });
+        } catch (error) {
+          console.log(`Error processing acadPlanCode ${acadPlanCode}:`, error);
+          throw error;
+        }
       }
     });
 
@@ -209,9 +211,10 @@ async function getAcadPlanDescription(acadPlanCode: string) {
 async function generateEmbeddingOpenAI(text: string) {
   try {
     const embeddingResponse = await openAi.embeddings.create({
-      model: "text-embedding-ada-002",
+      model: "text-embedding-3-small",
       input: text,
       encoding_format: "float",
+      dimensions: 512,
     });
 
     return embeddingResponse.data[0].embedding;

@@ -1,5 +1,5 @@
 export const vector = new sst.aws.Vector("dplAPVectorDB", {
-  dimension: 1536,
+  dimension: 512,
   transform: {
     postgres: {
       databaseName: "dplAPVectorDB",
