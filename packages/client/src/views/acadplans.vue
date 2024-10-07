@@ -86,6 +86,22 @@
         </div>
       </div>
     </div>
+    <!--Query Expansion-->
+
+    <div
+      v-if="expandedQuery"
+      class="query-expansion-result my-3 mx-3 py-2 px-2"
+      style="
+        border: 1px solid rgb(120 188 225);
+        box-shadow: rgb(198 227 243) 0px 0px 10px inset;
+        border-radius: 5px;
+      "
+    >
+      <span>
+        <strong class="mr-2">Showing Results for:</strong>
+        <i>{{ expandedQuery }}</i>
+      </span>
+    </div>
 
     <!-- acadPlans list -->
     <b-container fluid class="mt-4">
@@ -203,6 +219,7 @@ export default {
       userQuery: "",
       inputFocused: false,
       checkApiResponse: false,
+      expandedQuery: "",
 
       selectedDegreeType: "",
       selectedAcadPlanType: "",
@@ -281,6 +298,7 @@ export default {
 
         if (response.data && response.data.results.length) {
           this.acadPlans = response.data.results;
+          this.expandedQuery = response.data.expandedUserQuery;
           const currentQuery = this.$route.query;
           const newQuery = {
             degreeType: this.selectedDegreeType.name,
@@ -323,7 +341,7 @@ export default {
           const reasoningResponse = await lambdaInstance.get("/reasoning", {
             params: {
               acadPlanCode,
-              prompt: this.userQuery,
+              prompt: this.expandedQuery,
             },
           });
 
