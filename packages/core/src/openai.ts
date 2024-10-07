@@ -124,3 +124,73 @@ export async function generateReasoningOpenAI(
     throw error;
   }
 }
+
+export async function queryExpansion(userQuery: string) {
+  const expansionPrompt = `
+    You are an expert in query expansion, specifically focused on academic course recommendations.
+
+    Given a student query, your goal is to enhance it by understanding the underlying intent, even if the query is vague or lacks specific terminology. Follow these steps:
+    1. Analyze the query to infer the student’s interest in a field of study or career path.
+    2. Identify synonyms, alternate phrasings, or related terms that might represent the same academic goals. For example, if a student says "joker," expand it to "stand-up comedy," "theater," or "performance arts."
+    3. Expand concise keywords into more descriptive phrases, considering relevant academic disciplines or professions.
+    4. Ensure that all expansions align with the context of academic plans the student might be interested in.
+    5. If there are unclear terms or acronyms, leave them unchanged to avoid incorrect assumptions.
+    6. Only return the expanded query and avoid adding any additional information.
+
+    The goal is to create a more comprehensive query that maximizes the chances of retrieving relevant academic plans from the database.
+
+    ### Student Query: ###
+    ${userQuery}
+`;
+
+  try {
+    const expansionResponse = await openAi.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "Expand the student query to improve its clarity and relevance for academic course recommendations.",
+        },
+        { role: "user", content: expansionPrompt },
+      ],
+      max_tokens: 100,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "expansion",
+          description:
+            "The expanded query for academic course recommendations.",
+          schema: {
+            type: "object",
+            properties: {
+              expandedQuery: {
+                type: "string",
+              },
+            },
+            additionalProperties: false,
+            required: ["expandedQuery"],
+          },
+          strict: true,
+        },
+      },
+    });
+
+    const content = expansionResponse.choices[0].message.content;
+
+    if (content === null) {
+      throw new Error("Received null content from OpenAI response");
+    }
+
+    const parsedContent = JSON.parse(content);
+
+    if (!parsedContent.expandedQuery) {
+      throw new Error("Expanded query not found in the response");
+    }
+
+    return parsedContent.expandedQuery;
+  } catch (error) {
+    console.log(`Error expanding query`, error);
+    throw error;
+  }
+}

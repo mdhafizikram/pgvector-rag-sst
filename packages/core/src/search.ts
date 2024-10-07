@@ -1,5 +1,5 @@
 import { APIGatewayEvent } from "aws-lambda/trigger/api-gateway-proxy.js";
-import { generateEmbeddingOpenAI } from "./openai";
+import { generateEmbeddingOpenAI, queryExpansion } from "./openai";
 import { queryVectors } from "./vector-client";
 
 export async function Similarity_Search(event: APIGatewayEvent) {
@@ -41,6 +41,22 @@ export async function Similarity_Search(event: APIGatewayEvent) {
     //   };
     // }
 
+    // Query expansion
+    const expandedQuery = await queryExpansion(prompt);
+
+    if (!expandedQuery) {
+      return {
+        statusCode: 200,
+        body: JSON.stringify(
+          {
+            results: [],
+          },
+          null,
+          2
+        ),
+      };
+    }
+
     const includeParams = {
       type: "acadPlan",
     };
@@ -48,13 +64,15 @@ export async function Similarity_Search(event: APIGatewayEvent) {
     if (degreeType) includeParams.degreeType = degreeType;
     if (acadPlanType) includeParams.acadPlanType = acadPlanType;
 
-    const vector = await generateEmbeddingOpenAI(prompt);
+    const vector = await generateEmbeddingOpenAI(expandedQuery);
 
     const ret = await queryVectors({
       vector,
       count,
       includeParams,
     });
+
+    ret.expandedUserQuery = expandedQuery;
 
     return {
       statusCode: 200,
